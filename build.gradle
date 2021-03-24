@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'ericmurano.Application'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    testImplementation "junit:junit:4.12"
+}
+
+jar {
+    archiveBaseName = 'supermarket'
+    archiveVersion = '1.0'
+
+    manifest {
+        attributes(
+                'Main-Class': 'ericmurano.Application'
+        )
+    }
+}
