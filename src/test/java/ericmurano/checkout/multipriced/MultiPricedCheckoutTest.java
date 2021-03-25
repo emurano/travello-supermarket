@@ -4,8 +4,6 @@ import ericmurano.checkout.Item;
 import ericmurano.checkout.Price;
 import org.junit.After;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -55,10 +53,10 @@ public class MultiPricedCheckoutTest {
     }
 
     @Test
-    public void scan_oneItemProvidedButNoRulesDefinedForItem_totalMethodReturnsValuePrice() {
-        PricingRule rule = mockPricingRule("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleMap(rule));
+    public void scan_oneItemProvidedButNoRulesDefinedForItem_totalMethodReturnsZero() {
+        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(123.45));
         Item item = mockItem("BREAD");
+        checkout = new MultiPricedCheckout(pricingRuleMap(rule));
         checkout.scan(item);
 
         Price price = checkout.total();
@@ -66,9 +64,36 @@ public class MultiPricedCheckoutTest {
         assertEquals(BigDecimal.ZERO, price.amount());
     }
 
-    private PricingRule mockPricingRule(String sku) {
+    @Test
+    public void scan_oneItemProvidedButWithOneRuleDefinedForSku_totalMethodReturnsSkuPrice() {
+        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(123.45));
+        Item item = mockItem("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleMap(rule));
+        checkout.scan(item);
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(123.45), price.amount());
+    }
+
+    @Test
+    public void scan_twoItemSameSkuProvidedWithOneRuleDefinedForSku_totalMethodReturnsSkuPriceTimesTwo() {
+        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(75));
+        Item item1 = mockItem("BUTTER");
+        Item item2 = mockItem("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleMap(rule));
+        checkout.scan(item1);
+        checkout.scan(item2);
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(150), price.amount());
+    }
+
+    private PricingRule mockPricingRule(String sku, BigDecimal price) {
         PricingRule rule = mock(PricingRule.class);
         when(rule.sku()).thenReturn(sku);
+        when(rule.price()).thenReturn(price);
         return rule;
     }
 

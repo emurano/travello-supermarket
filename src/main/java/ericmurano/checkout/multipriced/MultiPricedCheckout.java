@@ -34,7 +34,7 @@ public class MultiPricedCheckout implements Checkout {
         BigDecimal total = scannedItems
             .stream()
             .filter(item -> pricingRules.containsKey(item.sku()))
-            .map(item -> BigDecimal.valueOf(100))
+            .map(item -> pricingRules.get(item.sku()).price())
             .reduce(BigDecimal.ZERO, (subtotal, element) -> subtotal.add(element));
 
         return new ImmutablePrice(total);
