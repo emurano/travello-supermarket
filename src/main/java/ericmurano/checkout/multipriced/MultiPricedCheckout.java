@@ -4,6 +4,7 @@ import ericmurano.checkout.Checkout;
 import ericmurano.checkout.Item;
 import ericmurano.checkout.Price;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 /**
@@ -25,6 +26,11 @@ public class MultiPricedCheckout implements Checkout {
 
     @Override
     public Price total() {
-        throw new RuntimeException("total not yet implemented");
+        return new Price() {
+            @Override
+            public BigDecimal amount() {
+                return BigDecimal.ZERO;
+            }
+        };
     }
 }
