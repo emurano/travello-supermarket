@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -55,20 +56,33 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_oneItemProvidedButNoRulesDefinedForItem_totalMethodReturnsValuePrice() {
-        PricingRule rule = mock(PricingRule.class);
-        when(rule.sku()).thenReturn("BUTTER");
-        checkout = new MultiPricedCheckout(
-            new HashMap<String, PricingRule>() {{ put("BUTTER", rule); }}
-        );
-
-        Item item = mock(Item.class);
-        when(item.sku()).thenReturn("BREAD");
+        PricingRule rule = mockPricingRule("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleMap(rule));
+        Item item = mockItem("BREAD");
         checkout.scan(item);
-
 
         Price price = checkout.total();
 
-
         assertEquals(BigDecimal.ZERO, price.amount());
+    }
+
+    private PricingRule mockPricingRule(String sku) {
+        PricingRule rule = mock(PricingRule.class);
+        when(rule.sku()).thenReturn(sku);
+        return rule;
+    }
+
+    private Map<String, PricingRule> pricingRuleMap(PricingRule... rules) {
+        Map<String, PricingRule> map = new HashMap<>();
+        Arrays
+            .stream(rules)
+            .forEach(pricingRule -> map.put(pricingRule.sku(), pricingRule));
+        return map;
+    }
+
+    private Item mockItem(String sku) {
+        Item item = mock(Item.class);
+        when(item.sku()).thenReturn(sku);
+        return item;
     }
 }
