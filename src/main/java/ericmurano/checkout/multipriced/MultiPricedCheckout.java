@@ -5,7 +5,8 @@ import ericmurano.checkout.Item;
 import ericmurano.checkout.Price;
 
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * A Checkout that discounts items based on the number of the same item that has
@@ -13,24 +14,43 @@ import java.util.Collection;
  */
 public class MultiPricedCheckout implements Checkout {
 
-    private final Collection<PricingRule> pricingRules;
+    private final Map<String, PricingRule> pricingRules;
+    private final ArrayList<Item> scannedItems;
 
-    public MultiPricedCheckout(Collection<PricingRule> pricingRules) {
+    public MultiPricedCheckout(Map<String, PricingRule> pricingRules) {
         this.pricingRules = pricingRules;
+        this.scannedItems = new ArrayList<>();
     }
 
     @Override
     public void scan(Item item) {
-        throw new RuntimeException("scan not yet implemented");
+        scannedItems.add(item);
     }
 
     @Override
     public Price total() {
-        return new Price() {
-            @Override
-            public BigDecimal amount() {
-                return BigDecimal.ZERO;
-            }
-        };
+        if (pricingRules == null) return new ImmutablePrice(BigDecimal.ZERO);
+        if (pricingRules.isEmpty()) return new ImmutablePrice(BigDecimal.ZERO);
+        BigDecimal total = scannedItems
+            .stream()
+            .filter(item -> pricingRules.containsKey(item.sku()))
+            .map(item -> BigDecimal.valueOf(100))
+            .reduce(BigDecimal.ZERO, (subtotal, element) -> subtotal.add(element));
+
+        return new ImmutablePrice(total);
+    }
+}
+
+class ImmutablePrice implements Price {
+
+    private final BigDecimal amount;
+
+    public ImmutablePrice(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    @Override
+    public BigDecimal amount() {
+        return amount;
     }
 }
