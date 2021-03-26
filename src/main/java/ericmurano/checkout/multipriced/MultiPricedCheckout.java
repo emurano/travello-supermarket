@@ -54,15 +54,15 @@ public class MultiPricedCheckout implements Checkout {
             .stream()
             .filter(rule -> Objects.nonNull(rule.price()))
             .filter(rule -> Objects.nonNull(rule.quantity()))
-            .filter(rule -> Objects.equals(rule.sku(), skuCount.getSku()))
-            .filter(rule -> rule.quantity() <= skuCount.getCount())
+            .filter(rule -> Objects.equals(rule.sku(), skuCount.sku()))
+            .filter(rule -> rule.quantity() <= skuCount.count())
             .min((rule1, rule2) -> rule2.quantity().compareTo(rule1.quantity()))
             .map(rule -> {
-                long remainingCount = skuCount.getCount() - rule.quantity();
+                long remainingCount = skuCount.count() - rule.quantity();
                 if (remainingCount > 0) {
                     return rule.price().add(
                         calculateSkuSubTotal(
-                            new SkuCount(skuCount.getSku(), remainingCount)
+                            new SkuCount(skuCount.sku(), remainingCount)
                         )
                     );
                 } else {
@@ -70,8 +70,8 @@ public class MultiPricedCheckout implements Checkout {
                 }
             })
             .orElseThrow(() -> new NoPricingRuleForQuantityException(
-                skuCount.getSku(),
-                skuCount.getCount()
+                skuCount.sku(),
+                skuCount.count()
             ));
     }
 
@@ -94,11 +94,11 @@ class SkuCount {
         this.sku = sku;
     }
 
-    public Long getCount() {
+    public Long count() {
         return count;
     }
 
-    public String getSku() {
+    public String sku() {
         return sku;
     }
 }
