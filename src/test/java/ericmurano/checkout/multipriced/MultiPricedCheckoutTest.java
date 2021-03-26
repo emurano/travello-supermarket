@@ -54,20 +54,20 @@ public class MultiPricedCheckoutTest {
 
     @Test(expected = NoPricingRuleForQuantityException.class)
     public void scan_oneItemProvidedButNoRulesDefinedForItem_throwsException() {
-        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(123.45), 1);
-        Item item = mockItem("BREAD");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule));
-        checkout.scan(item);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(123.45), 1)
+        ));
+        checkout.scan(mockItem("BREAD"));
 
         checkout.total();
     }
 
     @Test
     public void scan_oneItemProvidedButWithOneRuleDefinedForSku_totalMethodReturnsSkuPrice() {
-        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(123.45), 1);
-        Item item = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule));
-        checkout.scan(item);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(123.45), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -76,12 +76,11 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_twoItemSameSkuProvidedWithOneRuleDefinedForSku_totalMethodReturnsSkuPriceTimesTwo() {
-        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule));
-        checkout.scan(item1);
-        checkout.scan(item2);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -90,12 +89,11 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_twoItemDifferentSkuProvidedWithRulesDefinedForEach_totalMethodReturnsSingleSkuPricesSummed() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1));
-        checkout.scan(item1);
-        checkout.scan(item2);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -104,13 +102,12 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_twoItemsScanned_totalMethodReturnsSpecialPrice() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        PricingRule rule2 = mockPricingRule("BREAD", BigDecimal.valueOf(23.45), 1);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BREAD");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
-        checkout.scan(item1);
-        checkout.scan(item2);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1),
+            mockPricingRule("BREAD", BigDecimal.valueOf(23.45), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BREAD"));
 
         Price price = checkout.total();
 
@@ -119,13 +116,12 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_oneSkuScannedTwiceWithTwoItemSpecialPrice_totalMethodReturnsSpecialPrice() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        PricingRule rule2 = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
-        checkout.scan(item1);
-        checkout.scan(item2);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -134,15 +130,13 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void scan_oneSkuScannedThreeTimesWithTwoItemSpecialPrice_totalMethodReturnsSpecialPricePlusSinglePrice() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        PricingRule rule2 = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BUTTER");
-        Item item3 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
-        checkout.scan(item1);
-        checkout.scan(item2);
-        checkout.scan(item3);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -151,21 +145,21 @@ public class MultiPricedCheckoutTest {
 
     @Test(expected = NoPricingRuleForQuantityException.class)
     public void total_NoPricingRuleForItemCount_ThrowsException() {
-        PricingRule rule = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2);
-        Item item1 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule));
-        checkout.scan(item1);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2)
+        ));
+        checkout.scan(mockItem("BUTTER"));
 
         checkout.total();
     }
 
     @Test
     public void total_pricingRuleQuantityNull_notUsedInTotal() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), null);
-        PricingRule rule2 = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 1);
-        Item item1 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
-        checkout.scan(item1);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), null),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(80), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
@@ -174,17 +168,60 @@ public class MultiPricedCheckoutTest {
 
     @Test
     public void total_pricingRulePriceNull_notUsedInTotal() {
-        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
-        PricingRule rule2 = mockPricingRule("BUTTER", null, 2);
-        Item item1 = mockItem("BUTTER");
-        Item item2 = mockItem("BUTTER");
-        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
-        checkout.scan(item1);
-        checkout.scan(item2);
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1),
+            mockPricingRule("BUTTER", null, 2)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
 
         Price price = checkout.total();
 
         assertEquals(BigDecimal.valueOf(150), price.amount());
+    }
+
+    @Test
+    public void total_enoughScansForTwoSpecialPrices_appliesSpecialTwice() {
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(100), 1),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 2)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BUTTER"));
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(150), price.amount());
+    }
+
+    @Test
+    public void total_manyScansManyPrices_TotalReturnsExpected() {
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("A", new BigDecimal("15"), 1),
+            mockPricingRule("A", new BigDecimal("25"), 2),
+            mockPricingRule("B", new BigDecimal("100"), 1),
+            mockPricingRule("B", new BigDecimal("250"), 3),
+            mockPricingRule("B", new BigDecimal("800"), 10),
+            mockPricingRule("C", new BigDecimal("23.45"), 1)
+        ));
+        checkout.scan(mockItem("A"));
+        checkout.scan(mockItem("A"));
+        checkout.scan(mockItem("B"));
+        checkout.scan(mockItem("B"));
+        checkout.scan(mockItem("C"));
+        checkout.scan(mockItem("A"));
+        checkout.scan(mockItem("B"));
+        checkout.scan(mockItem("B"));
+        checkout.scan(mockItem("C"));
+        checkout.scan(mockItem("A"));
+        checkout.scan(mockItem("C"));
+        checkout.scan(mockItem("A"));
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(485.35), price.amount());
     }
 
     private PricingRule mockPricingRule(

@@ -56,7 +56,7 @@ public class MultiPricedCheckout implements Checkout {
             .filter(rule -> Objects.nonNull(rule.quantity()))
             .filter(rule -> Objects.equals(rule.sku(), skuCount.getSku()))
             .filter(rule -> rule.quantity() <= skuCount.getCount())
-            .min((rule1, rule2) -> rule2.price().compareTo(rule1.price()))
+            .min((rule1, rule2) -> rule2.quantity().compareTo(rule1.quantity()))
             .map(rule -> {
                 long remainingCount = skuCount.getCount() - rule.quantity();
                 if (remainingCount > 0) {
@@ -69,7 +69,10 @@ public class MultiPricedCheckout implements Checkout {
                     return rule.price();
                 }
             })
-            .orElseThrow(() -> new NoPricingRuleForQuantityException(skuCount.getSku(), skuCount.getCount())); // TODO Throw here instead?
+            .orElseThrow(() -> new NoPricingRuleForQuantityException(
+                skuCount.getSku(),
+                skuCount.getCount()
+            ));
     }
 
     private Set<SkuCount> scannedSkuCounts() {
