@@ -8,9 +8,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -137,6 +134,24 @@ public class MultiPricedCheckoutTest {
         assertEquals(BigDecimal.valueOf(80), price.amount());
     }
 
+    @Test
+    public void scan_oneSkuScannedThreeTimesWithTwoItemSpecialPrice_totalMethodReturnsSpecialPricePlusSinglePrice() {
+        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
+        PricingRule rule2 = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 2);
+        Item item1 = mockItem("BUTTER");
+        Item item2 = mockItem("BUTTER");
+        Item item3 = mockItem("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
+        checkout.scan(item1);
+        checkout.scan(item2);
+        checkout.scan(item3);
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(155), price.amount());
+    }
+
+    // TODO - if no pricing rule for the quantity
     // TODO - if pricing rule quantity is null
     // TODO - if pricing rule price is null
 
@@ -149,6 +164,7 @@ public class MultiPricedCheckoutTest {
         when(rule.sku()).thenReturn(sku);
         when(rule.price()).thenReturn(price);
         when(rule.quantity()).thenReturn(quantity);
+        when(rule.toString()).thenReturn(String.format("%s", price));
         return rule;
     }
 

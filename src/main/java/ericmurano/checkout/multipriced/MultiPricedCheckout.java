@@ -6,8 +6,7 @@ import ericmurano.checkout.Price;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,42 +35,60 @@ public class MultiPricedCheckout implements Checkout {
         if (pricingRules == null) return new ImmutablePrice(BigDecimal.ZERO);
         if (pricingRules.isEmpty()) return new ImmutablePrice(BigDecimal.ZERO);
 
-        final BigDecimal[] grandTotal = {BigDecimal.ZERO};
-
-        scannedSkuTotals()
-            .forEach((sku, numItems) -> {
-                 BigDecimal price = pricingRules
-                     .stream()
-                     .filter(rule -> Objects.equals(rule.sku(), sku))
-                     .filter(rule -> rule.quantity() >= numItems)
-                     .sorted((o1, o2) -> o1.quantity().compareTo(o1.quantity()))
-                     .findFirst()
-                     .map(rule -> rule.price())
-                     .orElse(BigDecimal.ZERO);
-
-                grandTotal[0] = grandTotal[0].add(price);
-            });
-
-        return new ImmutablePrice(grandTotal[0]);
-
-//        BigDecimal total = scannedItems
-//            .stream()
-//            .map(item -> pricingRules
-//                .stream()
-//                .filter(rule -> Objects.equals(rule.sku(), item.sku()))
-//                .map(PricingRule::price)
-//                .findFirst()
-//                .orElse(BigDecimal.ZERO)
-//            )
-//            .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        return new ImmutablePrice(total);
+        return new ImmutablePrice(
+            scannedSkuCounts()
+                .stream()
+                .map(this::calculateSkuSubTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
     }
 
-    private Map<String, Long> scannedSkuTotals() {
-        return scannedItems
+    private BigDecimal calculateSkuSubTotal(SkuCount skuCount) {
+        return pricingRules
             .stream()
-            .collect(Collectors.groupingBy(Item::sku, Collectors.counting()));
+            .filter(rule -> Objects.equals(rule.sku(), skuCount.getSku()))
+            .filter(rule -> rule.quantity() <= skuCount.getCount())
+            .min((rule1, rule2) -> rule2.price().compareTo(rule1.price()))
+            .map(rule -> {
+                long remainingCount = skuCount.getCount() - rule.quantity();
+                if (remainingCount > 0) {
+                    return rule.price().add(
+                        calculateSkuSubTotal(
+                            new SkuCount(skuCount.getSku(), remainingCount)
+                        )
+                    );
+                } else {
+                    return rule.price();
+                }
+            })
+            .orElse(BigDecimal.ZERO); // TODO Throw here instead?
+    }
+
+    private Set<SkuCount> scannedSkuCounts() {
+        HashSet<SkuCount> counts = new HashSet<>();
+        scannedItems
+            .stream()
+            .collect(Collectors.groupingBy(Item::sku, Collectors.counting()))
+            .forEach((sku, count) -> counts.add(new SkuCount(sku, count)));
+        return counts;
+    }
+}
+
+class SkuCount {
+    private final Long count;
+    private final String sku;
+
+    public SkuCount(String sku, Long count) {
+        this.count = count;
+        this.sku = sku;
+    }
+
+    public Long getCount() {
+        return count;
+    }
+
+    public String getSku() {
+        return sku;
     }
 }
 
