@@ -52,6 +52,8 @@ public class MultiPricedCheckout implements Checkout {
     private BigDecimal calculateSkuSubTotal(SkuCount skuCount) {
         return pricingRules
             .stream()
+            .filter(rule -> Objects.nonNull(rule.price()))
+            .filter(rule -> Objects.nonNull(rule.quantity()))
             .filter(rule -> Objects.equals(rule.sku(), skuCount.getSku()))
             .filter(rule -> rule.quantity() <= skuCount.getCount())
             .min((rule1, rule2) -> rule2.price().compareTo(rule1.price()))

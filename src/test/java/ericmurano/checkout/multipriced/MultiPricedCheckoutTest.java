@@ -159,8 +159,33 @@ public class MultiPricedCheckoutTest {
         checkout.total();
     }
 
-    // TODO - if pricing rule quantity is null
-    // TODO - if pricing rule price is null
+    @Test
+    public void total_pricingRuleQuantityNull_notUsedInTotal() {
+        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), null);
+        PricingRule rule2 = mockPricingRule("BUTTER", BigDecimal.valueOf(80), 1);
+        Item item1 = mockItem("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
+        checkout.scan(item1);
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(80), price.amount());
+    }
+
+    @Test
+    public void total_pricingRulePriceNull_notUsedInTotal() {
+        PricingRule rule1 = mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1);
+        PricingRule rule2 = mockPricingRule("BUTTER", null, 2);
+        Item item1 = mockItem("BUTTER");
+        Item item2 = mockItem("BUTTER");
+        checkout = new MultiPricedCheckout(pricingRuleSet(rule1, rule2));
+        checkout.scan(item1);
+        checkout.scan(item2);
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(150), price.amount());
+    }
 
     private PricingRule mockPricingRule(
         String sku,
