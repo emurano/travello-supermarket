@@ -1,19 +1,23 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-//mainClassName = 'ericmurano.Application'
-
 repositories {
     mavenCentral()
 }
 
-//sourceCompatibility = 1.8
-//targetCompatibility = 1.8
-
 dependencies {
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-all:1.10.19"
+    testCompile "junit:junit:4.12"
+    testCompile "org.mockito:mockito-all:1.10.19"
 }
+
+sourceSets {
+    test {
+        java.srcDir file("src/test/java")
+        resources.srcDir 'src/test/resources'
+    }
+}
+
+mainClassName = 'ericmurano.Application'
 
 jar {
     archiveBaseName = 'supermarket'
