@@ -30,6 +30,12 @@ public class MultiPricedCheckout implements Checkout {
         scannedItems.add(item);
     }
 
+    /**
+     * Calculates the total price of all scanned items
+     * @return The summed price of all scanned items
+     * @throws NoPricingRuleForQuantityException If there are no pricing rules
+     * for a SKU and the number of times the SKU was scanned
+     */
     @Override
     public Price total() {
         if (pricingRules == null) return new ImmutablePrice(BigDecimal.ZERO);
@@ -61,7 +67,7 @@ public class MultiPricedCheckout implements Checkout {
                     return rule.price();
                 }
             })
-            .orElse(BigDecimal.ZERO); // TODO Throw here instead?
+            .orElseThrow(() -> new NoPricingRuleForQuantityException(skuCount.getSku(), skuCount.getCount())); // TODO Throw here instead?
     }
 
     private Set<SkuCount> scannedSkuCounts() {
