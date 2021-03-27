@@ -94,6 +94,33 @@ public class MultiPricedCheckout implements Checkout {
             .values();
     }
 
+    private Set<SkuCount> scannedSkuCounts() {
+        HashSet<SkuCount> counts = new HashSet<>();
+        scannedItems
+            .stream()
+            .collect(Collectors.groupingBy(Item::sku, Collectors.counting()))
+            .forEach((sku, count) -> counts.add(new SkuCount(sku, count)));
+        return counts;
+    }
+
+    private class SkuCount {
+        private final Long count;
+        private final String sku;
+
+        public SkuCount(String sku, Long count) {
+            this.count = count;
+            this.sku = sku;
+        }
+
+        public Long count() {
+            return count;
+        }
+
+        public String sku() {
+            return sku;
+        }
+    }
+
     private class PriceKey {
         private final String sku;
         private final Integer quantity;
@@ -128,37 +155,5 @@ public class MultiPricedCheckout implements Checkout {
             result = 31 * result + quantity.hashCode();
             return result;
         }
-    }
-
-    private static Predicate<PricingRule> distinctByKey(Function<PricingRule, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
-    private Set<SkuCount> scannedSkuCounts() {
-        HashSet<SkuCount> counts = new HashSet<>();
-        scannedItems
-            .stream()
-            .collect(Collectors.groupingBy(Item::sku, Collectors.counting()))
-            .forEach((sku, count) -> counts.add(new SkuCount(sku, count)));
-        return counts;
-    }
-}
-
-class SkuCount {
-    private final Long count;
-    private final String sku;
-
-    public SkuCount(String sku, Long count) {
-        this.count = count;
-        this.sku = sku;
-    }
-
-    public Long count() {
-        return count;
-    }
-
-    public String sku() {
-        return sku;
     }
 }
