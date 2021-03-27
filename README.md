@@ -21,7 +21,8 @@ Time was tracked using a simple Markdown table with start and stop times.
 | 2021-03-26 | 6:20am  | 7:07am  | Implement multi-item prices                                                              | 47m        |
 | 2021-03-26 | 5:03pm  | 5:45pm  | Handle missing pricing rules for the number of items e.g. no price for 1 item            | 42m        |
 | 2021-03-26 | 8:13pm  | 10:04pm | Demo in main method, fix pricing rule bug, fix up gradle build file                      | 111m       |
-| 2021-03-26 | 10:05pm | 10:45pm | Write README.md file                                                                     | 40m        | 
+| 2021-03-26 | 10:05pm | 10:45pm | Write README.md file                                                                     | 40m        |
+| 2021-03-27 | 8:00PM  | 8:23pm  | Handle case of twice pricing rules with same quantity but different prices               | 23m        | 
 
 ## Project Configuration
 
@@ -102,15 +103,15 @@ I feel like this code could look better:
 .map(rule -> {
     long remainingCount = skuCount.count() - rule.quantity();
     if (remainingCount > 0) {
-        return rule.price().add(
-            calculateSkuSubTotal(
-                new SkuCount(skuCount.sku(), remainingCount)
-            )
-        );
+    return rule.price().add(
+    calculateSkuSubTotal(
+    new SkuCount(skuCount.sku(), remainingCount)
+    )
+    );
     } else {
-        return rule.price();
+    return rule.price();
     }
-})
+    })
 ```
 
 It's not wrong, but I don't immediately understand what is going on (and I wrote it!).

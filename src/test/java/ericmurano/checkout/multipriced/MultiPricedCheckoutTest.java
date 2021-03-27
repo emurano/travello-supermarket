@@ -197,6 +197,34 @@ public class MultiPricedCheckoutTest {
     }
 
     @Test
+    public void total_twoPricingRulesWithSameQuantityButDifferentPrice_appliesCheaperRule() {
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(100), 1),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(75), price.amount());
+    }
+
+    @Test
+    public void total_twoPricingRulesWithSameQuantityButDifferentPriceAndOtherPrices_appliesCheaperRule() {
+        checkout = new MultiPricedCheckout(pricingRuleSet(
+            mockPricingRule("BUTTER", BigDecimal.valueOf(100), 1),
+            mockPricingRule("BUTTER", BigDecimal.valueOf(75), 1),
+            mockPricingRule("BREAD", BigDecimal.valueOf(5.50), 1)
+        ));
+        checkout.scan(mockItem("BUTTER"));
+        checkout.scan(mockItem("BREAD"));
+
+        Price price = checkout.total();
+
+        assertEquals(BigDecimal.valueOf(80.50), price.amount());
+    }
+
+    @Test
     public void total_manyScansManyPrices_TotalReturnsExpected() {
         checkout = new MultiPricedCheckout(pricingRuleSet(
             mockPricingRule("A", new BigDecimal("15"), 1),
