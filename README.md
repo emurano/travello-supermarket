@@ -103,15 +103,15 @@ I feel like this code could look better:
 .map(rule -> {
     long remainingCount = skuCount.count() - rule.quantity();
     if (remainingCount > 0) {
-    return rule.price().add(
-    calculateSkuSubTotal(
-    new SkuCount(skuCount.sku(), remainingCount)
-    )
-    );
+        return rule.price().add(
+            calculateSkuSubTotal(
+                new SkuCount(skuCount.sku(), remainingCount)
+            )
+        );
     } else {
-    return rule.price();
+        return rule.price();
     }
-    })
+})
 ```
 
 It's not wrong, but I don't immediately understand what is going on (and I wrote it!).
