@@ -85,8 +85,8 @@ public class MultiPricedCheckout implements Checkout {
                 Function.identity(),
                 (existing, candidate) -> candidate.price().compareTo(existing.price()) <= 0
                     ? candidate
-                    : existing)
-            )
+                    : existing
+            ))
             .values();
     }
 
