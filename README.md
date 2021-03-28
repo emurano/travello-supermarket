@@ -97,6 +97,8 @@ I tend to prefer returning interfaces and consuming interfaces instead of concre
 
 ## Things that could be done to improve the code / application
 
+### Code readability of recursive call
+
 I feel like this code could look better:
 
 ```java
@@ -116,13 +118,14 @@ I feel like this code could look better:
 
 It's not wrong, but I don't immediately understand what is going on (and I wrote it!).
 
+### Caching 
+
+The `MultiPricesCheckout` class rebuilds the pricing rules collection on
+every call to `total()`. While it's not that big of a deal when the total is
+calculated so infrequently, if it were done more often then I'd look into a
+caching/memoisation enhancement.
+
 ## Test Coverage
 
 I wrote tests for the core code, not the `Application` and `MyPricingRule` classes. Test coverage for `ericmurano.multipriced` is 100% line coverage.
 
-## Things I would improve
-
-The `MultiPricesCheckout` class rebuilds the pricing rules collection on 
-every call to `total()`. While it's not that big of a deal when the total is 
-calculated so infrequently, if it were done more often then I'd look into a 
-caching/memoisation enhancement.
