@@ -7,15 +7,11 @@ import ericmurano.checkout.Price;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A Checkout that discounts items based on the number of the same item that has
@@ -85,7 +81,7 @@ public class MultiPricedCheckout implements Checkout {
             .filter(rule -> Objects.nonNull(rule.price()))
             .filter(rule -> Objects.nonNull(rule.quantity()))
             .collect(Collectors.toMap(
-                pricingRule -> new PriceKey(pricingRule),
+                PriceKey::new,
                 Function.identity(),
                 (existing, candidate) -> candidate.price().compareTo(existing.price()) <= 0
                     ? candidate
@@ -103,7 +99,7 @@ public class MultiPricedCheckout implements Checkout {
         return counts;
     }
 
-    private class SkuCount {
+    private static class SkuCount {
         private final Long count;
         private final String sku;
 
@@ -121,7 +117,7 @@ public class MultiPricedCheckout implements Checkout {
         }
     }
 
-    private class PriceKey {
+    private static class PriceKey {
         private final String sku;
         private final Integer quantity;
 
