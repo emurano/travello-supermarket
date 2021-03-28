@@ -6,7 +6,8 @@ Travello.
 
 ## Time taken
 
-Total time taken for coding and project setup was 5h 36m. Writing this README took 40 minutes.
+Total time taken for coding and project setup was 6h 39m. Writing this 
+README took 40 minutes.
 
 This is the first time I've set up a gradle project from scratch, without Spring Boot from
 Spring Initializr.
