@@ -130,14 +130,6 @@ public class MultiPricedCheckout implements Checkout {
             this.quantity = pricingRule.quantity();
         }
 
-        public String sku() {
-            return sku;
-        }
-
-        public Integer quantity() {
-            return quantity;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
